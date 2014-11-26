@@ -112,6 +112,9 @@ BOARD_RIL_CLASS := ../../../device/lge/u2-common/ril/
 BOARD_CUSTOM_GRAPHICS := ../../../device/lge/u2-common/recovery-gfx.c
 BOARD_CHARGER_ENABLE_SUSPEND := true
 
+# Override healthd HAL to use charge_counter for 1%
+BOARD_HAL_STATIC_LIBRARIES := libhealthd.omap4
+
 # SELinux
 BOARD_SEPOLICY_DIRS := \
     device/lge/u2-common/selinux
