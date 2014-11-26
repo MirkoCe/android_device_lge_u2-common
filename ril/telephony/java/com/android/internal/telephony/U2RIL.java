@@ -220,14 +220,18 @@ public class U2RIL extends RIL implements CommandsInterface {
                     case 2:
                     case 4:
                     case 7:
-                        mCallList.add(xcallID);
+                        if (!mCallList.contains(xcallID)) {
+                            mCallList.add(xcallID);
+                        }
                         if (mCallList.size() != 0) {
                             WriteLgeCPATH(1);
                             mCallPath = 1;
                         }
                         break;
                     case 6:
-                        mCallList.clear();
+                        if (mCallList.contains(xcallID)) {
+                            mCallList.remove(mCallList.indexOf(xcallID));
+                        }
                         if (mCallList.size() == 0) {
                             WriteLgeCPATH(0);
                             mCallPath = 0;
