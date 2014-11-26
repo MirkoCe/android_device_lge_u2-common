@@ -19,15 +19,18 @@
 
 void healthd_board_init(struct healthd_config *config)
 {
-    config->batteryCapacityPath = "/sys/class/power_supply/battery/charge_counter";
+    config->batteryCapacityPath = "/sys/class/power_supply/battery/capacity";
+    config->batteryStatusPath = "/sys/class/power_supply/battery/status";
+    config->batteryHealthPath = "/sys/class/power_supply/battery/health";
+    config->batteryPresentPath = "/sys/class/power_supply/battery/present";
+    config->batteryVoltagePath = "/sys/class/power_supply/battery/voltage_now";
+    config->batteryTemperaturePath = "/sys/class/power_supply/battery/temp";
+    config->batteryTechnologyPath = "/sys/class/power_supply/battery/technology";
 }
 
 
 int healthd_board_battery_update(struct android::BatteryProperties *props)
 {
-    if (props->batteryLevel > 100)
-        props->batteryLevel = 100;
-
     // return 0 to log periodic polled battery status to kernel log
     return 0;
 }
