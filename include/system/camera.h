@@ -103,6 +103,8 @@ enum {
     CAMERA_MSG_RAW_BURST = 0x2000,        // dataCallback
 #endif
 #endif
+    CAMERA_MSG_STATS_DATA = 0x1000,
+    CAMERA_MSG_META_DATA = 0x2000,
     CAMERA_MSG_ALL_MSGS = 0xFFFF
 };
 
@@ -351,6 +353,16 @@ typedef struct camera_face {
 #endif
 
 } camera_face_t;
+
+/**
+ * The information of a data type received in a camera frame.
+ */
+typedef enum {
+    /** Data buffer */
+    CAMERA_FRAME_DATA_BUF = 0x000,
+    /** File descriptor */
+    CAMERA_FRAME_DATA_FD = 0x100
+} camera_frame_data_type_t;
 
 /**
  * The metadata of the frame data.

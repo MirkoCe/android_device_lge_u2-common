@@ -66,7 +66,10 @@ PRODUCT_AAPT_CONFIG := normal hdpi
 
 PRODUCT_PACKAGES += \
     wifimac \
-    libnetcmdiface
+    libnetcmdiface \
+    libwpa_client \
+    hostapd \
+    wpa_supplicant
 
 PRODUCT_PACKAGES += \
     lights.omap4 \
@@ -99,7 +102,10 @@ PRODUCT_PACKAGES += \
     tf_daemon \
     libtf_crypto_sst \
     libmm_osal \
-    gralloc.omap4.so
+    gralloc.omap4.so \
+    libcorkscrew \
+    pvrsrvinit \
+    libPVRScopeServices.so
 
 #
 PRODUCT_PACKAGES += \
@@ -159,10 +165,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.bq.gpu_to_cpu_unsupported=1 \
     ro.hwui.disable_scissor_opt=true \
-    dalvik.vm.dexopt-flags=m=y,u=n \
     ro.sf.lcd_density=240 \
     ro.opengles.version=131072 \
-    dalvik.vm.dexopt-data-only=1 \
     ro.com.google.clientidbase=android-lge \
     ro.com.google.clientidbase.ms=android-lge \
     ro.com.google.clientidbase.gmm=android-lge \
@@ -182,12 +186,12 @@ PRODUCT_PACKAGES += \
     charger \
     charger_res_images
 
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/fs/system/bin/fstrim:system/bin/fstrim \
-    $(LOCAL_PATH)/fs/system/framework/com.android.location.provider.jar:system/framework/com.android.location.provider.jar \
-    $(LOCAL_PATH)/fs/system/etc/permissions/android.hardware.location.gps.xml:system/etc/permissions/android.hardware.location.gps.xml \
-    $(LOCAL_PATH)/fs/system/etc/permissions/com.android.location.provider.xml:system/etc/permissions/com.android.location.provider.xml \
-    $(LOCAL_PATH)/fs/system/etc/init.d/99lmk:system/etc/init.d/99lmk
+# Setup custom omap4xxx defines
+BOARD_USE_CUSTOM_LIBION := true
+
+# Symlinks
+PRODUCT_PACKAGES += \
+    libion.so
 
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/config/config-bcm.mk)

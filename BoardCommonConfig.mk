@@ -23,7 +23,7 @@ NEEDS_ARM_ERRATA_754319_754320 := true
 BOARD_GLOBAL_CFLAGS += -DNEEDS_ARM_ERRATA_754319_754320
 
 # Kernel
-BOARD_KERNEL_CMDLINE := androidboot.selinux=permissive
+BOARD_KERNEL_CMDLINE := androidboot.selinux=permissive selinux=0
 BOARD_KERNEL_BASE := 0x80000000
 BOARD_KERNEL_PAGESIZE := 2048
 
@@ -74,6 +74,8 @@ endif
 ifdef BOARD_USE_TI_ENHANCED_DOMX
     BOARD_USE_TI_DUCATI_H264_PROFILE := true
     TI_CUSTOM_DOMX_PATH := $(COMMON_FOLDER)/domx
+    BOARD_USE_TI_CUSTOM_DOMX := true
+    TARGET_SPECIFIC_HEADER_PATH += $(COMMON_FOLDER)/domx/omx_core/inc
     DOMX_PATH := $(COMMON_FOLDER)/domx
     ENHANCED_DOMX := true
 else
@@ -116,10 +118,10 @@ BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_HAL_STATIC_LIBRARIES := libhealthd.omap4
 
 # SELinux
-BOARD_SEPOLICY_DIRS := \
+BOARD_SEPOLICY_DIRS += \
     device/lge/u2-common/selinux
 
-BOARD_SEPOLICY_UNION := \
+BOARD_SEPOLICY_UNION += \
     file_contexts \
     pvrsrvinit.te \
     device.te \
