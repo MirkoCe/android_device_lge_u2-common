@@ -192,6 +192,10 @@ BOARD_USE_CUSTOM_LIBION := true
 # Symlinks
 PRODUCT_PACKAGES += \
     libion.so
+    
+# Newer camera API isn't supported.
+PRODUCT_PROPERTY_OVERRIDES += \
+    camera2.portability.force_api=1
 
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/config/config-bcm.mk)
