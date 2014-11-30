@@ -25,7 +25,9 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/media_profiles.xml:system/etc/media_profiles.xml \
     $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml \
-    $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf
+    $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf \
+    frameworks/av/media/libstagefright/data/media_codecs_google_telephony.xml:system/etc/media_codecs_google_telephony.xml \
+    frameworks/av/media/libstagefright/data/media_codecs_google_video.xml:system/etc/media_codecs_google_video.xml
 
 # wifi nvram calibration
 PRODUCT_COPY_FILES += \
@@ -33,7 +35,8 @@ PRODUCT_COPY_FILES += \
 
 # RIL stuffs
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/ipc_channels.config:system/etc/ipc_channels.config
+    $(LOCAL_PATH)/configs/ipc_channels.config:system/etc/ipc_channels.config \
+    device/sample/etc/apns-full-conf.xml:system/etc/apns-conf.xml
 
 # Permission files
 PRODUCT_COPY_FILES += \
