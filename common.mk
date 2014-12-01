@@ -106,7 +106,6 @@ PRODUCT_PACKAGES += \
     libtf_crypto_sst \
     libmm_osal \
     gralloc.omap4.so \
-    libcorkscrew \
     pvrsrvinit \
     libPVRScopeServices.so
 
