@@ -107,7 +107,8 @@ PRODUCT_PACKAGES += \
     libmm_osal \
     gralloc.omap4.so \
     pvrsrvinit \
-    libPVRScopeServices.so
+    libPVRScopeServices.so \
+    libcorkscrew
 
 #
 PRODUCT_PACKAGES += \
