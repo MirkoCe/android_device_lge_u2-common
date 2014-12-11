@@ -79,7 +79,6 @@ ifdef BOARD_USE_TI_ENHANCED_DOMX
     DOMX_PATH := $(COMMON_FOLDER)/domx
     ENHANCED_DOMX := true
     TARGET_NEEDS_BIONIC_MD5 := true
-    TARGET_ENABLE_NON_PIE_SUPPORT := true
 else
     DOMX_PATH := hardware/ti/omap4xxx/domx
 endif
