@@ -420,9 +420,7 @@ on property:dev.bootcomplete=1
     write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 20000
     write /sys/devices/system/cpu/cpufreq/interactive/min_sample_time 20000
 
-service charger /sbin/healthd
+service charger /sbin/healthd -c
     class charger
+    critical
     seclabel u:r:healthd:s0
-    user root
-    group root
-    oneshot
