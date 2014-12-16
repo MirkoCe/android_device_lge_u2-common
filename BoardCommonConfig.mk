@@ -61,6 +61,7 @@ BOARD_BLUEDROID_VENDOR_CONF := device/lge/u2-common/configs/vnd_u2.txt
 
 # Setup custom omap4xxx defines
 BOARD_USE_CUSTOM_LIBION := true
+TARGET_TI_HWC_HDMI_DISABLED := true
 
 # OMX
 HARDWARE_OMX := true
