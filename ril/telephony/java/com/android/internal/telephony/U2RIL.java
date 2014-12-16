@@ -27,6 +27,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
+import android.os.SystemService;
 
 import android.telephony.PhoneNumberUtils;
 import android.telephony.PhoneStateListener;
@@ -88,19 +89,13 @@ public class U2RIL extends RIL implements CommandsInterface {
 
     private int RIL_REQUEST_HANG_UP_CALL = 0xb7;
     private int RIL_REQUEST_LGE_CPATH = 0xfd;
-
-    /* We're not actually changing REQUEST_GET_IMEI, but it's one
-       of the first requests made after enabling the radio, and it
-       isn't repeated while the radio is on, so a good candidate to
-       inject initialization ops */
+    private int RIL_REQUEST_LGE_SEND_COMMAND = 0x113;
 
     @Override
     public void
     getIMEI(Message result) {
-        //RIL_REQUEST_LGE_SEND_COMMAND
-        // Use this to bootstrap a bunch of internal variables
         RILRequest rrLSC = RILRequest.obtain(
-                0x113, null);
+                RIL_REQUEST_LGE_SEND_COMMAND, null);
         rrLSC.mParcel.writeInt(1);
         rrLSC.mParcel.writeInt(0);
         send(rrLSC);
@@ -170,18 +165,30 @@ public class U2RIL extends RIL implements CommandsInterface {
         send(rr);
     }
 
-    static final int RIL_UNSOL_LGE_BATTERY_LEVEL_UPDATE = 1050;
     static final int RIL_UNSOL_LGE_XCALLSTAT = 1053;
+    static final int RIL_UNSOL_LGE_RESTART_RILD = 1055;
     static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED = 1060;
     static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW = 1061;
-    static final int RIL_UNSOL_LGE_SELECTED_SPEECH_CODEC = 1074;
+    static final int RIL_UNSOL_LGE_FACTORY_READY = 1080;
 
     private void WriteLgeCPATH(int path) {
         RILRequest rrLSL = RILRequest.obtain(
-                           RIL_REQUEST_LGE_CPATH, null);
+                RIL_REQUEST_LGE_CPATH, null);
         rrLSL.mParcel.writeInt(1);
         rrLSL.mParcel.writeInt(path);
         send(rrLSL);
+    }
+
+    private void restartRild() {
+        setRadioState(RadioState.RADIO_UNAVAILABLE);
+        SystemService.stop("ril-daemon");
+        RILRequest.resetSerial();
+        clearRequestList(RADIO_NOT_AVAILABLE, false);
+        SystemService.start("ril-daemon");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ie) {}
+        setRadioState(RadioState.RADIO_ON);
     }
 
     @Override
@@ -192,12 +199,12 @@ public class U2RIL extends RIL implements CommandsInterface {
         int response = p.readInt();
 
         switch(response) {
-            case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED: ret =  responseVoid(p); break;
-            case RIL_UNSOL_LGE_XCALLSTAT: ret =  responseInts(p); break;
-            case RIL_UNSOL_LGE_SELECTED_SPEECH_CODEC: ret =  responseVoid(p); break;
-            case RIL_UNSOL_LGE_BATTERY_LEVEL_UPDATE: ret =  responseVoid(p); break;
+            case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED:
-            case RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW: ret =  responseVoid(p); break;
+            case RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW:
+            case RIL_UNSOL_LGE_RESTART_RILD:
+            case RIL_UNSOL_LGE_FACTORY_READY: ret =  responseVoid(p); break;
+            case RIL_UNSOL_LGE_XCALLSTAT: ret =  responseInts(p); break;
 
             default:
                 // Rewind the Parcel
@@ -250,16 +257,17 @@ public class U2RIL extends RIL implements CommandsInterface {
 
                 break;
             case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
-                /* has bonus radio state int */
                 RadioState newState = getRadioStateFromInt(p.readInt());
                 p.setDataPosition(dataPosition);
                 super.processUnsolicited(p);
                 if (RadioState.RADIO_ON == newState) {
                     setNetworkSelectionModeAutomatic(null);
                 }
-                return;
-            case 1080: // RIL_UNSOL_LGE_FACTORY_READY (NG)
-                /* Adjust request IDs */
+                break;
+            case RIL_UNSOL_LGE_RESTART_RILD:
+                restartRild();
+                break;
+            case RIL_UNSOL_LGE_FACTORY_READY:
                 RIL_REQUEST_HANG_UP_CALL = 0xb7;
                 break;
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED:
@@ -270,14 +278,33 @@ public class U2RIL extends RIL implements CommandsInterface {
                     mIccStatusChangedRegistrants.notifyRegistrants();
                 }
                 break;
-            case RIL_UNSOL_LGE_BATTERY_LEVEL_UPDATE:
-            case RIL_UNSOL_LGE_SELECTED_SPEECH_CODEC:
-                if (RILJ_LOGD) riljLog("sinking LGE request > " + response);
-                break;
             default:
                 break;
         }
+    }
 
+    @Override
+    public void 
+    getNeighboringCids(Message response) {
+        AsyncResult.forMessage(response).exception =
+            new CommandException(CommandException.Error.REQUEST_NOT_SUPPORTED);
+        response.sendToTarget();
+        response = null;
+    }
+    
+    @Override
+    public void 
+    getImsRegistrationState(Message result) {
+        if (mRilVersion >= 8) {
+            super.getImsRegistrationState(result);
+        } else {
+            if (result != null) {
+                CommandException ex = new CommandException(
+                    CommandException.Error.REQUEST_NOT_SUPPORTED);
+                AsyncResult.forMessage(result, null, ex);
+                result.sendToTarget();
+            }
+        }
     }
 
     class CallPathHandler extends Handler implements Runnable {
@@ -325,5 +352,4 @@ public class U2RIL extends RIL implements CommandsInterface {
         public void run () {
         }
     }
-
 }
