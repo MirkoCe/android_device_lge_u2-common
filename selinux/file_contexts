@@ -1,5 +1,6 @@
 # GFX
 /dev/dsscomp                    u:object_r:video_device:s0
+/system/bin/pvrsrvinit          u:object_r:pvrsrvinit_exec:s0
 /system/vendor/bin/pvrsrvinit   u:object_r:pvrsrvinit_exec:s0
 /system/vendor/bin/pvrsrvinit_SGX540_120  u:object_r:pvrsrvinit_exec:s0
 
