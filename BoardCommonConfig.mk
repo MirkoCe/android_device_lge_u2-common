@@ -62,6 +62,7 @@ BOARD_BLUEDROID_VENDOR_CONF := device/lge/u2-common/configs/vnd_u2.txt
 # Setup custom omap4xxx defines
 BOARD_USE_CUSTOM_LIBION := true
 TARGET_TI_HWC_HDMI_DISABLED := true
+BACKLIGHT_PATH := "/sys/devices/platform/omap/omap_i2c.2/i2c-2/2-0036/brightness"
 
 # OMX
 HARDWARE_OMX := true
