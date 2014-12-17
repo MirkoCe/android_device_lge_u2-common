@@ -23,7 +23,7 @@ NEEDS_ARM_ERRATA_754319_754320 := true
 BOARD_GLOBAL_CFLAGS += -DNEEDS_ARM_ERRATA_754319_754320
 
 # Kernel
-BOARD_KERNEL_CMDLINE := androidboot.selinux=permissive selinux=0
+BOARD_KERNEL_CMDLINE :=
 BOARD_KERNEL_BASE := 0x80000000
 BOARD_KERNEL_PAGESIZE := 2048
 
@@ -119,16 +119,6 @@ BOARD_CHARGER_ENABLE_SUSPEND := true
 
 # Override healthd HAL to use charge_counter for 1%
 BOARD_HAL_STATIC_LIBRARIES := libhealthd.omap4
-
-# SELinux
-BOARD_SEPOLICY_DIRS += \
-    device/lge/u2-common/selinux
-
-BOARD_SEPOLICY_UNION += \
-    file_contexts \
-    pvrsrvinit.te \
-    device.te \
-    domain.te
 
 # CMHW
 BOARD_HARDWARE_CLASS := device/lge/u2-common/cmhw/
