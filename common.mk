@@ -191,9 +191,6 @@ PRODUCT_PACKAGES += \
     charger \
     charger_res_images
 
-# Setup custom omap4xxx defines
-BOARD_USE_CUSTOM_LIBION := true
-
 # Symlinks
 PRODUCT_PACKAGES += \
     libion.so
