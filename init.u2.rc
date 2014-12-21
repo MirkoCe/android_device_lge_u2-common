@@ -418,6 +418,8 @@ on property:dev.bootcomplete=1
     write /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor interactive
     write /sys/devices/system/cpu/cpufreq/interactive/timer_rate 20000
     write /sys/devices/system/cpu/cpufreq/interactive/min_sample_time 20000
+    write /sys/kernel/dyn_fsync/Dyn_fsync_active 1
+    write /sys/class/misc/fsynccontrol/fsync_enabled 1
 
 service charger /sbin/healthd -c
     class charger
