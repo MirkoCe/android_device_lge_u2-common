@@ -7,7 +7,7 @@ DEVICE_PACKAGE_OVERLAYS += device/lge/u2-common/overlay
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/recovery/postrecoveryboot.sh:recovery/root/sbin/postrecoveryboot.sh
 
-## Scripts and confs
+# Scripts and confs
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/init.u2.usb.rc:root/init.u2.usb.rc \
     $(LOCAL_PATH)/init.u2.rc:root/init.u2.rc \
@@ -58,7 +58,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.bluetooth.xml:system/etc/permissions/android.hardware.bluetooth.xml \
     frameworks/native/data/etc/android.hardware.bluetooth_le.xml:system/etc/permissions/android.hardware.bluetooth_le.xml
 
-## GPS
+# GPS
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/gps_brcm_conf.xml:system/etc/gps_brcm_conf.xml \
     $(LOCAL_PATH)/configs/SuplRootCert:system/etc/SuplRootCert \
@@ -111,7 +111,6 @@ PRODUCT_PACKAGES += \
     libPVRScopeServices.so \
     libcorkscrew
 
-#
 PRODUCT_PACKAGES += \
     libtiutils \
     libipcutils \
@@ -143,7 +142,7 @@ PRODUCT_PACKAGES += \
     libtimemmgr
 
 FRAMEWORKS_BASE_SUBDIRS += \
-	$(addsuffix /java, omapmmlib )
+    $(addsuffix /java, omapmmlib )
 
 PRODUCT_PACKAGES += \
     libskiahwdec \
@@ -152,12 +151,21 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     libstagefrighthw
 
-#RIL
+# Charger mode
+PRODUCT_PACKAGES += \
+    charger \
+    charger_res_images
+
+# Symlinks
+PRODUCT_PACKAGES += \
+    libion.so
+
+# RIL
 PRODUCT_PROPERTY_OVERRIDES += \
     rild.libpath=/system/lib/lge-ril.so \
     ro.telephony.ril_class=U2RIL
 
-#WIFI
+# WIFI
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0
 
@@ -166,6 +174,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.vold.switchablepair=/storage/sdcard0,/storage/sdcard1
     ro.additionalmounts=/storage/sdcard1
 
+# Build prop
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.bq.gpu_to_cpu_unsupported=1 \
     ro.hwui.disable_scissor_opt=true \
@@ -185,15 +194,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp,adb \
     ro.ksm.default=1 \
     ro.telephony.ril.config=fakeiccid
-
-# Charger mode
-PRODUCT_PACKAGES += \
-    charger \
-    charger_res_images
-
-# Symlinks
-PRODUCT_PACKAGES += \
-    libion.so
     
 # Newer camera API isn't supported.
 PRODUCT_PROPERTY_OVERRIDES += \
