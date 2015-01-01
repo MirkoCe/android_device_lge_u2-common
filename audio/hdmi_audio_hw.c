@@ -39,14 +39,10 @@
 #include <cutils/properties.h>
 
 #include <hardware/hardware.h>
-#include "audio.h"
+#include <system/audio.h>
 #include <hardware/audio.h>
 
 #include <tinyalsa/asoundlib.h>
-#include <audio_utils/resampler.h>
-#include <audio_utils/echo_reference.h>
-#include <hardware/audio_effect.h>
-#include <audio_effects/effect_aec.h>
 
 #include "hdmi_audio_hal.h"
 
