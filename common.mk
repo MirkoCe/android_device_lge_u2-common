@@ -68,6 +68,7 @@ PRODUCT_COPY_FILES += \
 $(call inherit-product, build/target/product/full.mk)
 
 PRODUCT_AAPT_CONFIG := normal hdpi
+PRODUCT_AAPT_PREF_CONFIG := hdpi
 
 PRODUCT_PACKAGES += \
     wifimac \
