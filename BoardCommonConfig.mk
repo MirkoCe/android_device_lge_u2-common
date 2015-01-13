@@ -64,6 +64,7 @@ BOARD_USE_CUSTOM_LIBION := true
 TARGET_TI_HWC_HDMI_DISABLED := true
 BACKLIGHT_PATH := "/sys/devices/platform/omap/omap_i2c.2/i2c-2/2-0036/brightness"
 WITH_DEXPREOPT := true
+BOARD_USE_CUSTOM_HWC := true
 
 # OMX
 HARDWARE_OMX := true
