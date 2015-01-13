@@ -55,13 +55,9 @@ public class U2RIL extends RIL implements CommandsInterface {
         PhoneStateListener mPhoneStateListener = new PhoneStateListener() {
             @Override
             public void onCallStateChanged(int state, String incomingNumber) {
-                /* Higher state wins, unless going back to idle */
-                if (state == TelephonyManager.CALL_STATE_IDLE || state > mCallState)
+                if (state == TelephonyManager.CALL_STATE_IDLE || state > mCallState) {
                     mCallState = state;
-
-
-                /* Loop a speakerphone status check while offhook, to
-                   adjust the model call path accordingly */
+                }
                 if (state == TelephonyManager.CALL_STATE_OFFHOOK) {
                     if (mPathHandler != null) {
                         mPathHandler.checkSpeakerphoneState();
@@ -70,7 +66,6 @@ public class U2RIL extends RIL implements CommandsInterface {
             }
         };
 
-        // register for phone state notifications.
         ((TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE))
             .listen(mPhoneStateListener,
                     PhoneStateListener.LISTEN_CALL_STATE);
@@ -87,21 +82,17 @@ public class U2RIL extends RIL implements CommandsInterface {
 
     protected int mCallState = TelephonyManager.CALL_STATE_IDLE;
 
-    private int RIL_REQUEST_HANG_UP_CALL = 0xb7;
-    private int RIL_REQUEST_LGE_CPATH = 0xfd;
+    private int RIL_REQUEST_HANG_UP_CALL = 0xB7;
+    private int RIL_REQUEST_LGE_CPATH = 0xFD;
     private int RIL_REQUEST_LGE_SEND_COMMAND = 0x113;
 
     @Override
-    public void
-    getIMEI(Message result) {
-        RILRequest rrLSC = RILRequest.obtain(
-                RIL_REQUEST_LGE_SEND_COMMAND, null);
+    public void getIMEI(Message result) {
+        RILRequest rrLSC = RILRequest.obtain(RIL_REQUEST_LGE_SEND_COMMAND, null);
         rrLSC.mParcel.writeInt(1);
         rrLSC.mParcel.writeInt(0);
         send(rrLSC);
-
-
-        // The original (and unmodified) IMEI request
+        
         RILRequest rr = RILRequest.obtain(RIL_REQUEST_GET_IMEI, result);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
@@ -110,12 +101,10 @@ public class U2RIL extends RIL implements CommandsInterface {
     }
 
     @Override
-    public void
-    hangupWaitingOrBackground (Message result) {
+    public void hangupWaitingOrBackground (Message result) {
         RILRequest rr = RILRequest.obtain(mCallState == TelephonyManager.CALL_STATE_OFFHOOK ?
                                         RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND :
-                                        RIL_REQUEST_HANG_UP_CALL,
-                                        result);
+                                        RIL_REQUEST_HANG_UP_CALL, result);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest));
 
@@ -123,11 +112,9 @@ public class U2RIL extends RIL implements CommandsInterface {
     }
 
     @Override
-    public void
-    setCallForward(int action, int cfReason, int serviceClass,
+    public void setCallForward(int action, int cfReason, int serviceClass,
                 String number, int timeSeconds, Message response) {
-        RILRequest rr
-                = RILRequest.obtain(RIL_REQUEST_SET_CALL_FORWARD, response);
+        RILRequest rr = RILRequest.obtain(RIL_REQUEST_SET_CALL_FORWARD, response);
 
         rr.mParcel.writeInt(action);
         rr.mParcel.writeInt(cfReason);
@@ -145,13 +132,11 @@ public class U2RIL extends RIL implements CommandsInterface {
     }
 
     @Override
-    public void
-    queryCallForwardStatus(int cfReason, int serviceClass,
+    public void queryCallForwardStatus(int cfReason, int serviceClass,
                 String number, Message response) {
-        RILRequest rr
-            = RILRequest.obtain(RIL_REQUEST_QUERY_CALL_FORWARD_STATUS, response);
+        RILRequest rr = RILRequest.obtain(RIL_REQUEST_QUERY_CALL_FORWARD_STATUS, response);
 
-        rr.mParcel.writeInt(2); // 2 is for query action, not in use anyway
+        rr.mParcel.writeInt(2);
         rr.mParcel.writeInt(cfReason);
         if (serviceClass == 0) serviceClass = 255;
         rr.mParcel.writeInt(serviceClass);
@@ -165,15 +150,8 @@ public class U2RIL extends RIL implements CommandsInterface {
         send(rr);
     }
 
-    static final int RIL_UNSOL_LGE_XCALLSTAT = 1053;
-    static final int RIL_UNSOL_LGE_RESTART_RILD = 1055;
-    static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED = 1060;
-    static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW = 1061;
-    static final int RIL_UNSOL_LGE_FACTORY_READY = 1080;
-
     private void WriteLgeCPATH(int path) {
-        RILRequest rrLSL = RILRequest.obtain(
-                RIL_REQUEST_LGE_CPATH, null);
+        RILRequest rrLSL = RILRequest.obtain(RIL_REQUEST_LGE_CPATH, null);
         rrLSL.mParcel.writeInt(1);
         rrLSL.mParcel.writeInt(path);
         send(rrLSL);
@@ -190,12 +168,17 @@ public class U2RIL extends RIL implements CommandsInterface {
         } catch (InterruptedException ie) {}
         setRadioState(RadioState.RADIO_ON);
     }
+    
+    static final int RIL_UNSOL_LGE_XCALLSTAT = 1053;
+    static final int RIL_UNSOL_LGE_RESTART_RILD = 1055;
+    static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED = 1060;
+    static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW = 1061;
+    static final int RIL_UNSOL_LGE_FACTORY_READY = 1080;
 
     @Override
-    protected void
-    processUnsolicited (Parcel p) {
+    protected void processUnsolicited (Parcel p) {
         Object ret;
-        int dataPosition = p.dataPosition(); // save off position within the Parcel
+        int dataPosition = p.dataPosition();
         int response = p.readInt();
 
         switch(response) {
@@ -205,12 +188,8 @@ public class U2RIL extends RIL implements CommandsInterface {
             case RIL_UNSOL_LGE_RESTART_RILD:
             case RIL_UNSOL_LGE_FACTORY_READY: ret =  responseVoid(p); break;
             case RIL_UNSOL_LGE_XCALLSTAT: ret =  responseInts(p); break;
-
             default:
-                // Rewind the Parcel
                 p.setDataPosition(dataPosition);
-
-                // Forward responses that we are not overriding to the super class
                 super.processUnsolicited(p);
                 return;
         }
@@ -264,7 +243,7 @@ public class U2RIL extends RIL implements CommandsInterface {
                 restartRild();
                 break;
             case RIL_UNSOL_LGE_FACTORY_READY:
-                RIL_REQUEST_HANG_UP_CALL = 0xb7;
+                RIL_REQUEST_HANG_UP_CALL = 0xB7;
                 break;
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED:
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW:
