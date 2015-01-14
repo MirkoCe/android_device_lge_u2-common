@@ -2513,6 +2513,8 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
     int ret;
 
     LOGFUNC("%s(%p, %s)", __FUNCTION__, dev, kvpairs);
+    
+    pthread_mutex_lock(&adev->lock);
 
     parms = str_parms_create_str(kvpairs);
     ret = str_parms_get_str(parms, AUDIO_PARAMETER_KEY_TTY_MODE, value, sizeof(value));
@@ -2530,13 +2532,11 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
         else
             return -EINVAL;
 
-        pthread_mutex_lock(&adev->lock);
         if (tty_mode != adev->tty_mode) {
             adev->tty_mode = tty_mode;
             if (adev->mode == AUDIO_MODE_IN_CALL)
                 select_output_device(adev);
         }
-        pthread_mutex_unlock(&adev->lock);
     }
 
     ret = str_parms_get_str(parms, AUDIO_PARAMETER_KEY_BT_NREC, value, sizeof(value));
@@ -2557,6 +2557,7 @@ static int adev_set_parameters(struct audio_hw_device *dev, const char *kvpairs)
     }
 
     str_parms_destroy(parms);
+    pthread_mutex_unlock(&adev->lock);
     return ret;
 }
 
