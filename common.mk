@@ -203,8 +203,7 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # Use awesome player for now
 PRODUCT_PROPERTY_OVERRIDES += \
-    persist.sys.media.use-awesome=true \
-    media.stagefright.use-awesome=true
+    persist.sys.media.use-awesome=true
 
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/config/config-bcm.mk)
