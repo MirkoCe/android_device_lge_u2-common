@@ -65,6 +65,7 @@ TARGET_TI_HWC_HDMI_DISABLED := true
 BACKLIGHT_PATH := "/sys/devices/platform/omap/omap_i2c.2/i2c-2/2-0036/brightness"
 WITH_DEXPREOPT := true
 BOARD_USE_CUSTOM_HWC := true
+TARGET_NEEDS_BIONIC_MD5 := true
 
 # OMX
 HARDWARE_OMX := true
@@ -82,7 +83,6 @@ ifdef BOARD_USE_TI_ENHANCED_DOMX
     TARGET_SPECIFIC_HEADER_PATH += $(COMMON_FOLDER)/domx/omx_core/inc
     DOMX_PATH := $(COMMON_FOLDER)/domx
     ENHANCED_DOMX := true
-    TARGET_NEEDS_BIONIC_MD5 := true
 else
     DOMX_PATH := hardware/ti/omap4xxx/domx
 endif
@@ -97,6 +97,7 @@ BOARD_USERDATAIMAGE_PARTITION_SIZE := 2469606195
 BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_HAS_NO_MISC_PARTITION := true
 
+# Vibration
 BOARD_HAS_VIBRATOR_IMPLEMENTATION := ../../device/lge/u2-common/vibrator.c
 
 # Camera
@@ -112,7 +113,7 @@ SGX_MODULES:
 
 TARGET_KERNEL_MODULES += SGX_MODULES
 
-## Radio fixes
+# Radio fixes
 BOARD_RIL_CLASS := ../../../device/lge/u2-common/ril/
 
 # Charger
