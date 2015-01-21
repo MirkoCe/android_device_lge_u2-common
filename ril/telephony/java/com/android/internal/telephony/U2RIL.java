@@ -237,6 +237,9 @@ public class U2RIL extends RIL implements CommandsInterface {
                 break;
             case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
                 RadioState newState = getRadioStateFromInt(p.readInt());
+                if (RadioState.RADIO_ON == newState) {
+                    setNetworkSelectionModeAutomatic(null);
+                }
                 switchToRadioState(newState);
                 break;
             case RIL_UNSOL_LGE_RESTART_RILD:
