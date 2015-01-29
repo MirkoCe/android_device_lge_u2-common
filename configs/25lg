@@ -35,10 +35,3 @@ echo "1230 1110 940" > /sys/class/misc/customvoltage/core_voltages
 # 0 = off, 1 = on
 echo "1" > /sys/kernel/debug/smartreflex/sr_iva/autocomp
 echo "1281 1104 940" > /sys/class/misc/customvoltage/iva_voltages
-
-# Low memory killer
-# This settings will be more agressive, but we 
-# need it because our phone has only 200-300 mb free
-# on lollipop. Delete this command if you want
-# better multitasking, but worse performance
-echo "2560,5120,25600,35840,46080,51200" > /sys/module/lowmemorykiller/parameters/minfree
