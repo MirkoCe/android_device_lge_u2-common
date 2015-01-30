@@ -194,7 +194,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
     ro.build.target_operator=OPEN \
     ro.bt.bdaddr_path=/sys/devices/platform/bd_address/bdaddr_if \
     persist.sys.usb.config=mtp,adb \
-    ro.ksm.default=1
+    ro.ksm.default=1 \
+    qemu.hw.mainkeys=1
     
 # Newer camera API isn't supported.
 PRODUCT_PROPERTY_OVERRIDES += \
