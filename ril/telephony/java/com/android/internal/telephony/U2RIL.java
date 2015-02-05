@@ -27,6 +27,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Parcel;
+import android.os.SystemService;
 
 import android.telephony.PhoneNumberUtils;
 import android.telephony.PhoneStateListener;
@@ -100,7 +101,7 @@ public class U2RIL extends RIL implements CommandsInterface {
     }
 
     @Override
-    public void hangupWaitingOrBackground(Message result) {
+    public void hangupWaitingOrBackground (Message result) {
         RILRequest rr = RILRequest.obtain(mCallState == TelephonyManager.CALL_STATE_OFFHOOK ?
                                         RIL_REQUEST_HANGUP_WAITING_OR_BACKGROUND :
                                         RIL_REQUEST_HANG_UP_CALL, result);
@@ -121,7 +122,7 @@ public class U2RIL extends RIL implements CommandsInterface {
         rr.mParcel.writeInt(serviceClass);
         rr.mParcel.writeInt(PhoneNumberUtils.toaFromString(number));
         rr.mParcel.writeString(number);
-        rr.mParcel.writeInt(timeSeconds);
+        rr.mParcel.writeInt (timeSeconds);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest)
                     + " " + action + " " + cfReason + " " + serviceClass
@@ -141,7 +142,7 @@ public class U2RIL extends RIL implements CommandsInterface {
         rr.mParcel.writeInt(serviceClass);
         rr.mParcel.writeInt(PhoneNumberUtils.toaFromString(number));
         rr.mParcel.writeString(number);
-        rr.mParcel.writeInt(0);
+        rr.mParcel.writeInt (0);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> " + requestToString(rr.mRequest)
                 + " " + cfReason + " " + serviceClass);
@@ -155,16 +156,27 @@ public class U2RIL extends RIL implements CommandsInterface {
         rrLSL.mParcel.writeInt(path);
         send(rrLSL);
     }
+
+    private void restartRild() {
+        setRadioState(RadioState.RADIO_UNAVAILABLE);
+        SystemService.stop("ril-daemon");
+        RILRequest.resetSerial();
+        clearRequestList(RADIO_NOT_AVAILABLE, false);
+        SystemService.start("ril-daemon");
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException ie) {}
+        setRadioState(RadioState.RADIO_ON);
+    }
     
-    static final int RIL_UNSOL_LGE_BATTERY_LEVEL_UPDATE = 1050;
     static final int RIL_UNSOL_LGE_XCALLSTAT = 1053;
+    static final int RIL_UNSOL_LGE_RESTART_RILD = 1055;
     static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED = 1060;
     static final int RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW = 1061;
-    static final int RIL_UNSOL_LGE_SELECTED_SPEECH_CODEC = 1074;
     static final int RIL_UNSOL_LGE_FACTORY_READY = 1080;
 
     @Override
-    protected void processUnsolicited(Parcel p) {
+    protected void processUnsolicited (Parcel p) {
         Object ret;
         int dataPosition = p.dataPosition();
         int response = p.readInt();
@@ -173,8 +185,7 @@ public class U2RIL extends RIL implements CommandsInterface {
             case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED:
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW:
-            case RIL_UNSOL_LGE_BATTERY_LEVEL_UPDATE:
-            case RIL_UNSOL_LGE_SELECTED_SPEECH_CODEC:
+            case RIL_UNSOL_LGE_RESTART_RILD:
             case RIL_UNSOL_LGE_FACTORY_READY: ret =  responseVoid(p); break;
             case RIL_UNSOL_LGE_XCALLSTAT: ret =  responseInts(p); break;
             default:
@@ -182,7 +193,6 @@ public class U2RIL extends RIL implements CommandsInterface {
                 super.processUnsolicited(p);
                 return;
         }
-        
         switch(response) {
             case RIL_UNSOL_LGE_XCALLSTAT:
                 int[] intArray = (int[]) ret;
@@ -221,7 +231,9 @@ public class U2RIL extends RIL implements CommandsInterface {
                     default:
                         break;
                 }
+
                 if (RILJ_LOGD) riljLog("LGE XCALLSTAT > {" + xcallID + "," +  xcallState + "}");
+
                 break;
             case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
                 RadioState newState = getRadioStateFromInt(p.readInt());
@@ -230,19 +242,19 @@ public class U2RIL extends RIL implements CommandsInterface {
                 }
                 switchToRadioState(newState);
                 break;
+            case RIL_UNSOL_LGE_RESTART_RILD:
+                restartRild();
+                break;
             case RIL_UNSOL_LGE_FACTORY_READY:
                 RIL_REQUEST_HANG_UP_CALL = 0xB7;
                 break;
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED:
             case RIL_UNSOL_LGE_SIM_STATE_CHANGED_NEW:
                 if (RILJ_LOGD) unsljLog(response);
+
                 if (mIccStatusChangedRegistrants != null) {
                     mIccStatusChangedRegistrants.notifyRegistrants();
                 }
-                break;
-            case RIL_UNSOL_LGE_BATTERY_LEVEL_UPDATE:
-            case RIL_UNSOL_LGE_SELECTED_SPEECH_CODEC:
-                if (RILJ_LOGD) riljLog("sinking LGE request > " + response);
                 break;
             default:
                 break;
@@ -251,7 +263,7 @@ public class U2RIL extends RIL implements CommandsInterface {
 
     class CallPathHandler extends Handler implements Runnable {
 
-        public CallPathHandler(Looper looper) {
+        public CallPathHandler (Looper looper) {
             super(looper);
         }
 
@@ -269,10 +281,12 @@ public class U2RIL extends RIL implements CommandsInterface {
                 } else {
                     callPath = 0;
                 }
+
                 if (callPath != mCallPath) {
                     mCallPath = callPath;
                     WriteLgeCPATH(callPath);
                 }
+
                 Message msg = obtainMessage();
                 msg.what = 0xc0ffee;
                 sendMessageDelayed(msg, 2500);
@@ -280,7 +294,7 @@ public class U2RIL extends RIL implements CommandsInterface {
         }
 
         @Override
-        public void handleMessage(Message msg) {
+        public void handleMessage (Message msg) {
             if (msg.what == 0xc0ffee) {
                 if (mCallState == TelephonyManager.CALL_STATE_OFFHOOK) {
                     checkSpeakerphoneState();
@@ -289,7 +303,7 @@ public class U2RIL extends RIL implements CommandsInterface {
         }
 
         @Override
-        public void run() {
+        public void run () {
         }
     }
 }
