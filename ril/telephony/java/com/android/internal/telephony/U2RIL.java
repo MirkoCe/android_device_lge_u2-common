@@ -258,7 +258,11 @@ public class U2RIL extends RIL implements CommandsInterface {
                 break;
             case RIL_UNSOL_RESPONSE_RADIO_STATE_CHANGED:
                 RadioState newState = getRadioStateFromInt(p.readInt());
-                switchToRadioState(newState);
+                p.setDataPosition(dataPosition);
+                super.processUnsolicited(p);
+                if (RadioState.RADIO_ON == newState) {
+                    setNetworkSelectionModeAutomatic(null);
+                }
                 break;
             case RIL_UNSOL_LGE_RESTART_RILD:
                 restartRild();
@@ -276,6 +280,30 @@ public class U2RIL extends RIL implements CommandsInterface {
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void 
+    getNeighboringCids(Message response) {
+        AsyncResult.forMessage(response).exception =
+            new CommandException(CommandException.Error.REQUEST_NOT_SUPPORTED);
+        response.sendToTarget();
+        response = null;
+    }
+    
+    @Override
+    public void 
+    getImsRegistrationState(Message result) {
+        if (mRilVersion >= 8) {
+            super.getImsRegistrationState(result);
+        } else {
+            if (result != null) {
+                CommandException ex = new CommandException(
+                    CommandException.Error.REQUEST_NOT_SUPPORTED);
+                AsyncResult.forMessage(result, null, ex);
+                result.sendToTarget();
+            }
         }
     }
 
