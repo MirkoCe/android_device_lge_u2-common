@@ -136,3 +136,7 @@ BOARD_SEPOLICY_UNION += \
     pvrsrvinit.te \
     device.te \
     domain.te
+    
+# Bootanimation
+TARGET_SCREEN_HEIGHT := 720
+TARGET_SCREEN_WIDTH := 480
