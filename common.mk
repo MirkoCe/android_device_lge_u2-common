@@ -205,10 +205,6 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     persist.sys.media.use-awesome=true
 
-# CPU OC init.d
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/25lg:system/etc/init.d/25lg
-
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
 $(call inherit-product-if-exists, hardware/broadcom/wlan/bcmdhd/config/config-bcm.mk)
 $(call inherit-product, vendor/lge/u2/u2-vendor.mk)
