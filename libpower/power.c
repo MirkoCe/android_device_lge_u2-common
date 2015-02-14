@@ -109,7 +109,7 @@ static void omap_power_set_interactive(struct power_module *module, int on)
 {
     get_scaling_governor();
     if (strncmp(governor, "interactive", 11) == 0)
-        sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", on ? "30000" : "150000");
+        sysfs_write(CPUFREQ_INTERACTIVE "timer_rate", on ? "20000" : "150000");
     if (strncmp(governor, "ondemand", 8) == 0)
         sysfs_write(CPUFREQ_ONDEMAND "sampling_rate", on ? "60000" : "150000");
 }
@@ -117,8 +117,9 @@ static void omap_power_set_interactive(struct power_module *module, int on)
 static void configure_governor()
 {
     omap_power_set_interactive(NULL, 1);
+    sysfs_write(CPUFREQ_CPU0 "screen_off_max_freq", "800000");
     if (strncmp(governor, "interactive", 11) == 0) {
-        sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "90000");
+        sysfs_write(CPUFREQ_INTERACTIVE "min_sample_time", "20000");
         sysfs_write(CPUFREQ_INTERACTIVE "above_hispeed_delay", "30000");
         sysfs_write(CPUFREQ_INTERACTIVE "hispeed_freq", "600000");
     } else if (strncmp(governor, "ondemand", 8) == 0) {
