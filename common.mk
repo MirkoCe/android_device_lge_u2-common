@@ -36,8 +36,7 @@ PRODUCT_COPY_FILES += \
 
 # RIL stuffs
 PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/ipc_channels.config:system/etc/ipc_channels.config \
-    device/sample/etc/apns-full-conf.xml:system/etc/apns-conf.xml
+    $(LOCAL_PATH)/configs/ipc_channels.config:system/etc/ipc_channels.config
 
 # Permission files
 PRODUCT_COPY_FILES += \
